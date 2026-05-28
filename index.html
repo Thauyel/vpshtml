@@ -1,21 +1,247 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VPS HTML — Git-Synced</title>
-    <style>
-        body { font-family: system-ui; max-width: 800px; margin: 80px auto; padding: 0 20px; }
-        h1 { color: #333; }
-        code { background: #f4f4f4; padding: 2px 6px; border-radius: 4px; }
-        .note { background: #e8f0fe; border-left: 4px solid #4285f4; padding: 12px 16px; margin: 24px 0; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thauyel VPS — Services</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0d0d0f;
+      color: #e0e0e0;
+      font-family: 'Courier New', monospace;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      color: #ffffff;
+      margin-bottom: 6px;
+      letter-spacing: 2px;
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 0.75rem;
+      margin-bottom: 40px;
+      letter-spacing: 1px;
+    }
+
+    .stats {
+      display: flex;
+      gap: 40px;
+      margin-bottom: 50px;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-value {
+      font-size: 1.8rem;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .stat-label {
+      font-size: 0.65rem;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .dot {
+      display: inline-block;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+
+    .dot.online { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
+    .dot.offline { background: #ef4444; box-shadow: 0 0 6px #ef4444; }
+
+    .services {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+      max-width: 960px;
+    }
+
+    .service {
+      background: #141418;
+      border: 1px solid #222228;
+      border-radius: 6px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .service-info {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .service-name {
+      font-size: 0.9rem;
+      color: #fff;
+    }
+
+    .service-detail {
+      font-size: 0.65rem;
+      color: #444;
+    }
+
+    .status-badge {
+      font-size: 0.65rem;
+      padding: 3px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      flex-shrink: 0;
+    }
+
+    .status-badge.online {
+      background: rgba(34, 197, 94, 0.12);
+      color: #22c55e;
+      border: 1px solid rgba(34, 197, 94, 0.2);
+    }
+
+    .status-badge.offline {
+      background: rgba(239, 68, 68, 0.12);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .footer {
+      margin-top: 50px;
+      font-size: 0.65rem;
+      color: #333;
+    }
+  </style>
 </head>
 <body>
-    <h1>VPS HTML — Git-Synced</h1>
-    <p>This site deploys via GitHub webhook every time you push to <code>vpshtml</code>.</p>
-    <div class="note">Webhook endpoint: <code>/webhook/vpshtml</code></div>
-    <p>Last updated: 2026-05-28</p>
+
+  <h1>THAUYEL.VPS</h1>
+  <p class="subtitle">VPS Service Status &mdash; Milan, OVHcloud</p>
+
+  <div class="stats">
+    <div class="stat">
+      <span class="stat-value">46G / 193G</span>
+      <span class="stat-label">Disk Used</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value">11Gi / 22Gi</span>
+      <span class="stat-label">RAM</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value">19d</span>
+      <span class="stat-label">Uptime</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value">8</span>
+      <span class="stat-label">vCPU</span>
+    </div>
+  </div>
+
+  <div class="services">
+
+    <div class="service">
+      <div class="service-info">
+        <span class="service-name">Nginx</span>
+        <span class="service-detail">Port 80/443 &mdash; thauyel.com</span>
+      </div>
+      <span class="status-badge online">Online</span>
+    </div>
+
+    <div class="service">
+      <div class="service-info">
+        <span class="service-name">Minecraft Server</span>
+        <span class="service-detail">Port 25565 &mdash; Paper MC</span>
+      </div>
+      <span class="status-badge online">Online</span>
+    </div>
+
+    <div class="service">
+      <div class="service-info">
+        <span class="service-name">dcbot</span>
+        <span class="service-detail">Screen session &mdash; Discord bot</span>
+      </div>
+      <span class="status-badge online">Online</span>
+    </div>
+
+    <div class="service">
+      <div class="service-info">
+        <span class="service-name">pqr</span>
+        <span class="service-detail">Port 5001 &mdash; Polimi QR tool</span>
+      </div>
+      <span class="status-badge online">Online</span>
+    </div>
+
+    <div class="service">
+      <div class="service-info">
+        <span class="service-name">CUPS</span>
+        <span class="service-detail">Port 631 &mdash; Print server</span>
+      </div>
+      <span class="status-badge online">Online</span>
+    </div>
+
+    <div class="service">
+      <div class="service-info">
+        <span class="service-name">Glances</span>
+        <span class="service-detail">Port 10000 &mdash; Monitoring</span>
+      </div>
+      <span class="status-badge online">Online</span>
+    </div>
+
+    <div class="service">
+      <div class="service-info">
+        <span class="service-name">Webhook Receiver</span>
+        <span class="service-detail">Port 9000 &mdash; Git deploy</span>
+      </div>
+      <span class="status-badge online">Online</span>
+    </div>
+
+    <div class="service">
+      <div class="service-info">
+        <span class="service-name">Hermes Agent</span>
+        <span class="service-detail">AI assistant &mdash; CLI/Discord/Telegram</span>
+      </div>
+      <span class="status-badge online">Online</span>
+    </div>
+
+    <div class="service">
+      <div class="service-info">
+        <span class="service-name">SSH</span>
+        <span class="service-detail">Port 22 &mdash; Server access</span>
+      </div>
+      <span class="status-badge online">Online</span>
+    </div>
+
+    <div class="service">
+      <div class="service-info">
+        <span class="service-name">GMod Server</span>
+        <span class="service-detail">Port 27015 &mdash; TTT (stopped)</span>
+      </div>
+      <span class="status-badge offline">Offline</span>
+    </div>
+
+  </div>
+
+  <p class="footer">Last updated: 2026-05-28 &mdash; Auto-refresh every 60s</p>
+
+  <script>
+    // Auto-refresh every 60s
+    setTimeout(() => location.reload(), 60000);
+  </script>
+
 </body>
 </html>
-<p>Test push 2026-05-28</p>
