@@ -3,237 +3,527 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Thauyel VPS — Services</title>
+  <title>Thauyel VPS — Status</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg: #09090e;
+      --surface: #111318;
+      --surface2: #181b22;
+      --border: #1e2330;
+      --text: #dde1f0;
+      --text-dim: #5a6072;
+      --accent: #4f8ef7;
+      --accent-dim: rgba(79,142,247,0.12);
+      --green: #2dd4a8;
+      --green-dim: rgba(45,212,168,0.1);
+      --red: #f75f5f;
+      --red-dim: rgba(247,95,95,0.1);
+      --yellow: #f7c04a;
+      --font: 'Inter', system-ui, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      background: #0d0d0f;
-      color: #e0e0e0;
-      font-family: 'Courier New', monospace;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font);
       min-height: 100vh;
-      padding: 40px 20px;
+      padding: 0 20px 60px;
     }
 
-    h1 {
-      font-size: 1.4rem;
-      color: #ffffff;
-      margin-bottom: 6px;
-      letter-spacing: 2px;
-    }
-
-    .subtitle {
-      color: #666;
-      font-size: 0.75rem;
-      margin-bottom: 40px;
-      letter-spacing: 1px;
-    }
-
-    .stats {
+    /* ── HEADER ─────────────────────────────── */
+    header {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 0 28px;
       display: flex;
-      gap: 32px;
-      margin-bottom: 50px;
+      align-items: flex-end;
+      justify-content: space-between;
       flex-wrap: wrap;
+      gap: 12px;
     }
 
-    .stat {
+    .brand h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: 3px;
+      color: #fff;
+    }
+
+    .brand .sub {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      letter-spacing: 1px;
+      margin-top: 3px;
+    }
+
+    .header-right {
+      text-align: right;
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      line-height: 1.8;
+    }
+
+    .uptime-val {
+      color: var(--green);
+      font-weight: 500;
+    }
+
+    /* ── GRID LAYOUT ─────────────────────────── */
+    .grid {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto auto;
+      gap: 14px;
+    }
+
+    /* ── CARD ───────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+    }
+
+    .card-title {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 16px;
+    }
+
+    /* ── METRIC CARDS ROW ───────────────────── */
+    .metrics-row {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .metric-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+
+    .metric-label {
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 10px;
+    }
+
+    .metric-main {
+      font-family: var(--mono);
+      font-size: 1.7rem;
+      font-weight: 500;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .metric-main .unit {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      margin-left: 2px;
+    }
+
+    .metric-bar {
+      height: 4px;
+      background: var(--surface2);
+      border-radius: 2px;
+      margin-top: 12px;
+      overflow: hidden;
+    }
+
+    .metric-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+      transition: width 0.6s ease;
+    }
+
+    .metric-bar-fill.cpu { background: var(--accent); }
+    .metric-bar-fill.ram { background: var(--green); }
+    .metric-bar-fill.disk { background: var(--yellow); }
+    .metric-bar-fill.load { background: #c084fc; }
+
+    .metric-sub {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--text-dim);
+      margin-top: 8px;
+    }
+
+    /* ── PROCESS COLUMNS ────────────────────── */
+    .process-col {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+    }
+
+    .process-list {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 8px;
     }
 
-    .stat-value {
-      font-size: 1.4rem;
-      color: #fff;
-      font-weight: bold;
-    }
-
-    .stat-value .sub {
-      font-size: 0.75rem;
-      color: #555;
-      font-weight: normal;
-    }
-
-    .stat-label {
-      font-size: 0.65rem;
-      color: #555;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .services {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    .process-item {
+      display: flex;
+      align-items: center;
       gap: 12px;
-      max-width: 960px;
+      padding: 8px 12px;
+      background: var(--surface2);
+      border-radius: 6px;
+      border: 1px solid var(--border);
     }
 
-    .service {
-      background: #141418;
-      border: 1px solid #222228;
-      border-radius: 6px;
-      padding: 16px 20px;
+    .process-rank {
+      font-family: var(--mono);
+      font-size: 0.6rem;
+      color: var(--text-dim);
+      width: 16px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .process-name {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--text);
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .process-bar-wrap {
+      flex: 2;
+      height: 4px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 2px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .process-bar-fill {
+      height: 100%;
+      border-radius: 2px;
+    }
+
+    .process-val {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      width: 40px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* ── SERVICES ───────────────────────────── */
+    .services-section {
+      grid-column: 1 / -1;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .service-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      padding: 12px 14px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      gap: 10px;
     }
 
-    .service-info {
+    .service-labels {
       display: flex;
       flex-direction: column;
-      gap: 3px;
+      gap: 2px;
+      min-width: 0;
     }
 
     .service-name {
-      font-size: 0.9rem;
-      color: #fff;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text);
     }
 
     .service-detail {
       font-size: 0.65rem;
-      color: #444;
+      color: var(--text-dim);
+      font-family: var(--mono);
     }
 
-    .status-badge {
-      font-size: 0.65rem;
-      padding: 3px 10px;
-      border-radius: 20px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
       flex-shrink: 0;
     }
 
-    .status-badge.online {
-      background: rgba(34, 197, 94, 0.12);
-      color: #22c55e;
-      border: 1px solid rgba(34, 197, 94, 0.2);
+    .dot.online {
+      background: var(--green);
+      box-shadow: 0 0 6px rgba(45,212,168,0.6);
     }
 
-    .status-badge.offline {
-      background: rgba(239, 68, 68, 0.12);
-      color: #ef4444;
-      border: 1px solid rgba(239, 68, 68, 0.2);
+    .dot.offline {
+      background: var(--red);
+      box-shadow: 0 0 6px rgba(247,95,95,0.4);
     }
 
+    .dot.always-on {
+      background: var(--accent);
+      box-shadow: 0 0 6px rgba(79,142,247,0.5);
+    }
+
+    /* ── FOOTER ─────────────────────────────── */
     .footer {
-      margin-top: 50px;
+      max-width: 1100px;
+      margin: 20px auto 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       font-size: 0.65rem;
-      color: #333;
+      color: var(--text-dim);
+      font-family: var(--mono);
     }
 
-    #last-updated { color: #444; }
+    .footer-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pulse {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    @media (max-width: 700px) {
+      .metrics-row { grid-template-columns: 1fr 1fr; }
+      .grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 420px) {
+      .metrics-row { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body>
 
-  <h1>THAUYEL.VPS</h1>
-  <p class="subtitle">VPS Service Status &mdash; Milan, OVHcloud</p>
+  <header>
+    <div class="brand">
+      <h1>THAUYEL.VPS</h1>
+      <p class="sub">Milan &mdash; OVHcloud &mdash; Auto-refresh 30s</p>
+    </div>
+    <div class="header-right">
+      <div>UPTIME</div>
+      <div class="uptime-val" id="hdr-uptime">--</div>
+    </div>
+  </header>
 
-  <div class="stats">
-    <div class="stat">
-      <span class="stat-value" id="stat-disk">--</span>
-      <span class="stat-label">Disk</span>
+  <div class="grid">
+
+    <!-- METRICS ROW -->
+    <div class="metrics-row">
+      <div class="metric-card">
+        <div class="metric-label">CPU</div>
+        <div class="metric-main" id="m-cpu">--<span class="unit">%</span></div>
+        <div class="metric-bar"><div class="metric-bar-fill cpu" id="bar-cpu" style="width:0%"></div></div>
+        <div class="metric-sub" id="s-cpu">-- cores</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">RAM</div>
+        <div class="metric-main" id="m-ram">--<span class="unit">GB</span></div>
+        <div class="metric-bar"><div class="metric-bar-fill ram" id="bar-ram" style="width:0%"></div></div>
+        <div class="metric-sub" id="s-ram">-- / -- GB</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Disk</div>
+        <div class="metric-main" id="m-disk">--<span class="unit">GB</span></div>
+        <div class="metric-bar"><div class="metric-bar-fill disk" id="bar-disk" style="width:0%"></div></div>
+        <div class="metric-sub" id="s-disk">-- / -- GB</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Load (1m)</div>
+        <div class="metric-main" id="m-load">--</div>
+        <div class="metric-bar"><div class="metric-bar-fill load" id="bar-load" style="width:0%"></div></div>
+        <div class="metric-sub" id="s-load">5m: -- &nbsp; 15m: --</div>
+      </div>
     </div>
-    <div class="stat">
-      <span class="stat-value" id="stat-ram">--</span>
-      <span class="stat-label">RAM</span>
+
+    <!-- TOP CPU -->
+    <div class="process-col">
+      <div class="card-title">Top CPU</div>
+      <div class="process-list" id="proc-cpu">
+        <div class="process-item" style="justify-content:center;color:var(--text-dim);font-size:0.75rem">Loading...</div>
+      </div>
     </div>
-    <div class="stat">
-      <span class="stat-value" id="stat-cpu">--</span>
-      <span class="stat-label">CPU</span>
+
+    <!-- TOP RAM -->
+    <div class="process-col">
+      <div class="card-title">Top RAM</div>
+      <div class="process-list" id="proc-ram">
+        <div class="process-item" style="justify-content:center;color:var(--text-dim);font-size:0.75rem">Loading...</div>
+      </div>
     </div>
-    <div class="stat">
-      <span class="stat-value" id="stat-load">--</span>
-      <span class="stat-label">Load (1m)</span>
+
+    <!-- SERVICES -->
+    <div class="services-section card">
+      <div class="card-title">Services</div>
+      <div class="services-grid" id="services-grid"></div>
     </div>
-    <div class="stat">
-      <span class="stat-value" id="stat-uptime">--</span>
-      <span class="stat-label">Uptime</span>
-    </div>
+
   </div>
 
-  <div class="services" id="services">
-    <!-- Populated by JS -->
+  <div class="footer">
+    <span>Last updated: <span id="last-updated">--</span></span>
+    <div class="footer-right">
+      <div class="pulse"></div>
+      <span id="status-live">Live</span>
+    </div>
   </div>
-
-  <p class="footer">
-    Last updated: <span id="last-updated">--</span> &mdash; Auto-refresh every 30s
-  </p>
 
   <script>
     const SERVICES = [
-      { key: 'minecraft', name: 'Minecraft Server', detail: 'Port 25565 \u2014 Paper MC',      screen: 'polimc' },
-      { key: 'gmod',      name: 'GMod Server',       detail: 'Port 27015 \u2014 TTT',         screen: 'gmod' },
-      { key: 'terraria',  name: 'Terraria Server',   detail: 'Port 7777 \u2014 tmodloader',   screen: 'terraria' },
-      { key: 'pqr',       name: 'pqr',                detail: 'Port 5001 \u2014 Polimi QR',    always_on: true },
-      { key: 'dcbot',     name: 'dcbot',              detail: 'Discord bot',                  always_on: true },
-      { key: 'hermes',    name: 'Hermes Agent',       detail: 'AI assistant',                 always_on: true },
-      { key: 'nginx',     name: 'Nginx',              detail: 'Port 80/443 \u2014 thauyel.com', always_on: true },
-      { key: 'cups',      name: 'CUPS',               detail: 'Port 631 \u2014 Print server',  always_on: true },
-      { key: 'ssh',       name: 'SSH',                detail: 'Port 22',                      always_on: true },
+      { key: 'minecraft', name: 'Minecraft',    detail: '25565 &mdash; Paper MC',      screen: 'polimc',    always_on: false },
+      { key: 'gmod',       name: 'GMod',          detail: '27015 &mdash; TTT',          screen: 'gmod',      always_on: false },
+      { key: 'terraria',   name: 'Terraria',      detail: '7777 &mdash; tmodloader',    screen: 'terraria',  always_on: false },
+      { key: 'pqr',        name: 'pqr',            detail: '5001 &mdash; Polimi QR',     screen: null,        always_on: true  },
+      { key: 'dcbot',      name: 'dcbot',          detail: 'Discord bot',               screen: null,        always_on: true  },
+      { key: 'hermes',     name: 'Hermes Agent',   detail: 'AI assistant',             screen: null,        always_on: true  },
+      { key: 'nginx',      name: 'Nginx',          detail: '80 / 443 &mdash; thauyel.com', screen: null,     always_on: true  },
+      { key: 'ssh',        name: 'SSH',             detail: '22',                        screen: null,        always_on: true  },
+      { key: 'cups',       name: 'CUPS',            detail: '631 &mdash; Print server',  screen: null,        always_on: true  },
     ];
 
-    function badge(s) {
-      return `<span class="status-badge ${s}">${s}</span>`;
-    }
+    const MAX_CPU = 800; // ~8 cores × 100%
+    const MAX_RAM = 100;
 
-    function renderServices(services, data) {
-      const el = document.getElementById('services');
-      el.innerHTML = services.map(svc => {
-        let online;
-        if (svc.always_on) {
-          online = true;
-        } else if (svc.screen && data[svc.key] !== undefined) {
-          online = data[svc.key].online;
-        }
-        return `<div class="service">
-          <div class="service-info">
-            <span class="service-name">${svc.name}</span>
-            <span class="service-detail">${svc.detail}</span>
+    function renderTopProc(list, maxVal, type) {
+      if (!list || list.length === 0) {
+        return `<div class="process-item" style="justify-content:center;color:var(--text-dim);font-size:0.75rem">No data</div>`;
+      }
+      return list.map((p, i) => {
+        const val = type === 'cpu' ? p.cpu : p.ram_pct;
+        const pct = Math.min((val / maxVal) * 100, 100).toFixed(1);
+        const color = type === 'cpu' ? 'var(--accent)' : 'var(--green)';
+        return `<div class="process-item">
+          <span class="process-rank">${i + 1}</span>
+          <span class="process-name" title="${p.name}">${p.name}</span>
+          <div class="process-bar-wrap">
+            <div class="process-bar-fill" style="width:${pct}%;background:${color}"></div>
           </div>
-          ${badge(online ? 'online' : 'offline')}
+          <span class="process-val">${val}${type === 'cpu' ? '%' : '%'}</span>
         </div>`;
       }).join('');
     }
 
-    function formatUptime(seconds) {
-      const days = Math.floor(seconds / 86400);
-      const hours = Math.floor((seconds % 86400) / 3600);
-      if (days > 0) return `${days}d ${hours}h`;
-      const mins = Math.floor((seconds % 3600) / 60);
-      return `${hours}h ${mins}m`;
+    function renderServices(svcs, data) {
+      const el = document.getElementById('services-grid');
+      el.innerHTML = svcs.map(svc => {
+        let dotClass = 'offline';
+        let dotTitle = 'offline';
+        if (svc.always_on) {
+          dotClass = 'always-on';
+          dotTitle = 'always on';
+        } else if (svc.screen && data[svc.key] !== undefined) {
+          const online = data[svc.key].online;
+          dotClass = online ? 'online' : 'offline';
+          dotTitle = online ? 'online' : 'offline';
+        }
+        return `<div class="service-row">
+          <div class="dot ${dotClass}" title="${dotTitle}"></div>
+          <div class="service-labels">
+            <span class="service-name">${svc.name}</span>
+            <span class="service-detail">${svc.detail}</span>
+          </div>
+        </div>`;
+      }).join('');
     }
 
     function update() {
       fetch('/status')
         .then(r => r.json())
         .then(data => {
+          const s = data.system || {};
+
+          // Header uptime
+          const days = s.uptime_days ?? 0;
+          const hours = s.uptime_hours ?? 0;
+          document.getElementById('hdr-uptime').textContent =
+            days > 0 ? `${days}d ${hours}h` : `${hours}h`;
+
+          // Metrics
+          const cpu = s.cpu_pct ?? 0;
+          const ram = s.ram_used_gb ?? 0;
+          const ramTotal = s.ram_total_gb ?? 0;
+          const ramPct = s.ram_pct ?? 0;
+          const disk = s.disk_used_gb ?? 0;
+          const diskTotal = s.disk_total_gb ?? 0;
+          const diskPct = s.disk_pct ?? 0;
+          const load1 = s.load_1m ?? 0;
+          const load5 = s.load_5m ?? 0;
+          const load15 = s.load_15m ?? 0;
+
+          document.getElementById('m-cpu').innerHTML = `${cpu}<span class="unit">%</span>`;
+          document.getElementById('bar-cpu').style.width = `${cpu}%`;
+          document.getElementById('s-cpu').textContent = `${Math.round(cpu / 12.5)} cores at capacity`;
+
+          document.getElementById('m-ram').innerHTML = `${ram}<span class="unit">GB</span>`;
+          document.getElementById('bar-ram').style.width = `${ramPct}%`;
+          document.getElementById('s-ram').textContent = `${ramPct.toFixed(1)}% of ${ramTotal} GB`;
+
+          document.getElementById('m-disk').innerHTML = `${disk}<span class="unit">GB</span>`;
+          document.getElementById('bar-disk').style.width = `${diskPct}%`;
+          document.getElementById('s-disk').textContent = `${diskPct.toFixed(1)}% of ${diskTotal} GB`;
+
+          document.getElementById('m-load').textContent = load1.toFixed(2);
+          const loadBar = Math.min((load1 / 8) * 100, 100);
+          document.getElementById('bar-load').style.width = `${loadBar}%`;
+          document.getElementById('s-load').innerHTML = `5m: ${load5.toFixed(2)} &nbsp; 15m: ${load15.toFixed(2)}`;
+
+          // Top processes
+          document.getElementById('proc-cpu').innerHTML = renderTopProc(s.top_cpu, MAX_CPU, 'cpu');
+          document.getElementById('proc-ram').innerHTML = renderTopProc(s.top_ram, MAX_RAM, 'ram');
+
+          // Services
           renderServices(SERVICES, data);
 
-          const s = data.system || {};
-          const diskUsed = s.disk_used_gb !== undefined ? s.disk_used_gb : '--';
-          const diskTotal = s.disk_total_gb !== undefined ? s.disk_total_gb : '--';
-          const ramUsed = s.ram_used_gb !== undefined ? s.ram_used_gb : '--';
-          const ramTotal = s.ram_total_gb !== undefined ? s.ram_total_gb : '--';
-
-          document.getElementById('stat-disk').textContent =
-            diskTotal ? `${diskUsed} / ${diskTotal} GB` : `${diskUsed} GB`;
-          document.getElementById('stat-ram').textContent =
-            ramTotal ? `${ramUsed} / ${ramTotal} GB` : `${ramUsed} GB`;
-          document.getElementById('stat-cpu').textContent =
-            s.cpu_pct !== undefined ? `${s.cpu_pct}%` : '--';
-          document.getElementById('stat-load').textContent =
-            s.load_1m !== undefined ? s.load_1m : '--';
-
-          if (s.load_1m !== undefined) {
-            document.getElementById('stat-uptime').textContent = '--';
-          }
-
-          document.getElementById('last-updated').textContent =
-            new Date().toLocaleTimeString();
+          // Footer
+          document.getElementById('last-updated').textContent = new Date().toLocaleTimeString();
         })
-        .catch(() => {});
+        .catch(() => {
+          document.getElementById('status-live').textContent = 'Disconnected';
+        });
     }
 
     update();
