@@ -247,18 +247,22 @@
     .service-row {
       display: flex;
       align-items: center;
-      justify-content: space-between;
       padding: 12px 14px;
       background: var(--surface2);
       border: 1px solid var(--border);
       border-radius: 8px;
-      gap: 10px;
+      gap: 12px;
+    }
+
+    .service-row .dot {
+      flex-shrink: 0;
     }
 
     .service-labels {
       display: flex;
       flex-direction: column;
       gap: 2px;
+      flex: 1;
       min-width: 0;
     }
 
@@ -278,7 +282,6 @@
       width: 7px;
       height: 7px;
       border-radius: 50%;
-      flex-shrink: 0;
     }
 
     .dot.online {
