@@ -126,6 +126,10 @@
       font-size: 0.65rem;
       color: #333;
     }
+
+    #last-updated {
+      color: #444;
+    }
   </style>
 </head>
 <body>
@@ -135,15 +139,15 @@
 
   <div class="stats">
     <div class="stat">
-      <span class="stat-value">46G / 193G</span>
+      <span class="stat-value" id="stat-disk">--</span>
       <span class="stat-label">Disk Used</span>
     </div>
     <div class="stat">
-      <span class="stat-value">11Gi / 22Gi</span>
+      <span class="stat-value" id="stat-ram">--</span>
       <span class="stat-label">RAM</span>
     </div>
     <div class="stat">
-      <span class="stat-value">19d</span>
+      <span class="stat-value" id="stat-uptime">--</span>
       <span class="stat-label">Uptime</span>
     </div>
     <div class="stat">
@@ -152,95 +156,71 @@
     </div>
   </div>
 
-  <div class="services">
-
-    <div class="service">
-      <div class="service-info">
-        <span class="service-name">Nginx</span>
-        <span class="service-detail">Port 80/443 &mdash; thauyel.com</span>
-      </div>
-      <span class="status-badge online">Online</span>
-    </div>
-
-    <div class="service">
-      <div class="service-info">
-        <span class="service-name">Minecraft Server</span>
-        <span class="service-detail">Port 25565 &mdash; Paper MC</span>
-      </div>
-      <span class="status-badge online">Online</span>
-    </div>
-
-    <div class="service">
-      <div class="service-info">
-        <span class="service-name">dcbot</span>
-        <span class="service-detail">Screen session &mdash; Discord bot</span>
-      </div>
-      <span class="status-badge online">Online</span>
-    </div>
-
-    <div class="service">
-      <div class="service-info">
-        <span class="service-name">pqr</span>
-        <span class="service-detail">Port 5001 &mdash; Polimi QR tool</span>
-      </div>
-      <span class="status-badge online">Online</span>
-    </div>
-
-    <div class="service">
-      <div class="service-info">
-        <span class="service-name">CUPS</span>
-        <span class="service-detail">Port 631 &mdash; Print server</span>
-      </div>
-      <span class="status-badge online">Online</span>
-    </div>
-
-    <div class="service">
-      <div class="service-info">
-        <span class="service-name">Glances</span>
-        <span class="service-detail">Port 10000 &mdash; Monitoring</span>
-      </div>
-      <span class="status-badge online">Online</span>
-    </div>
-
-    <div class="service">
-      <div class="service-info">
-        <span class="service-name">Webhook Receiver</span>
-        <span class="service-detail">Port 9000 &mdash; Git deploy</span>
-      </div>
-      <span class="status-badge online">Online</span>
-    </div>
-
-    <div class="service">
-      <div class="service-info">
-        <span class="service-name">Hermes Agent</span>
-        <span class="service-detail">AI assistant &mdash; CLI/Discord/Telegram</span>
-      </div>
-      <span class="status-badge online">Online</span>
-    </div>
-
-    <div class="service">
-      <div class="service-info">
-        <span class="service-name">SSH</span>
-        <span class="service-detail">Port 22 &mdash; Server access</span>
-      </div>
-      <span class="status-badge online">Online</span>
-    </div>
-
-    <div class="service">
-      <div class="service-info">
-        <span class="service-name">GMod Server</span>
-        <span class="service-detail">Port 27015 &mdash; Game Server (stopped)</span>
-      </div>
-      <span class="status-badge offline">Offline</span>
-    </div>
-
+  <div class="services" id="services">
+    <!-- Populated by JS -->
   </div>
 
-  <p class="footer">Last updated: 2026-05-28 &mdash; Auto-refresh every 60s</p>
+  <p class="footer">
+    Last updated: <span id="last-updated">--</span> &mdash; Auto-refresh every 30s
+  </p>
 
   <script>
-    // Auto-refresh every 60s
-    setTimeout(() => location.reload(), 60000);
+    const SERVICES = [
+      { key: 'nginx',       name: 'Nginx',          detail: 'Port 80/443 \u2014 thauyel.com',   always_on: true },
+      { key: 'minecraft',   name: 'Minecraft Server', detail: 'Port 25565 \u2014 Paper MC',        screen: 'polimc' },
+      { key: 'gmod',        name: 'GMod Server',      detail: 'Port 27015 \u2014 TTT',            screen: 'gmod' },
+      { key: 'terraria',    name: 'Terraria Server',  detail: 'Port 7777 \u2014 tmodloader',      screen: 'terraria' },
+      { key: 'dcbot',       name: 'dcbot',            detail: 'Screen session \u2014 Discord bot', always_on: true },
+      { key: 'pqr',         name: 'pqr',              detail: 'Port 5001 \u2014 Polimi QR tool',   always_on: true },
+      { key: 'cups',        name: 'CUPS',             detail: 'Port 631 \u2014 Print server',     always_on: true },
+      { key: 'hermes',      name: 'Hermes Agent',     detail: 'AI assistant \u2014 CLI/Discord/Telegram', always_on: true },
+      { key: 'ssh',         name: 'SSH',              detail: 'Port 22 \u2014 Server access',     always_on: true },
+    ];
+
+    function badge(status) {
+      return `<span class="status-badge ${status}">${status}</span>`;
+    }
+
+    function render(services, data) {
+      const el = document.getElementById('services');
+      el.innerHTML = services.map(svc => {
+        let online;
+        if (svc.always_on) {
+          online = true;
+        } else if (svc.screen && data[svc.key] !== undefined) {
+          online = data[svc.key].online;
+        }
+        return `<div class="service">
+          <div class="service-info">
+            <span class="service-name">${svc.name}</span>
+            <span class="service-detail">${svc.detail}</span>
+          </div>
+          ${badge(online ? 'online' : 'offline')}
+        </div>`;
+      }).join('');
+    }
+
+    function update() {
+      fetch('/status')
+        .then(r => r.json())
+        .then(data => {
+          render(SERVICES, data);
+          if (data.system) {
+            if (data.system.disk) document.getElementById('stat-disk').textContent = data.system.disk;
+            if (data.system.ram) document.getElementById('stat-ram').textContent = data.system.ram;
+            if (data.system.uptime) document.getElementById('stat-uptime').textContent = data.system.uptime;
+          }
+          const now = new Date();
+          document.getElementById('last-updated').textContent =
+            now.toLocaleTimeString();
+        })
+        .catch(() => {
+          // Network error — leave last state visible
+        });
+    }
+
+    update();
+    setInterval(update, 30000);
   </script>
 
 </body>
