@@ -31,7 +31,7 @@
 
     .stats {
       display: flex;
-      gap: 40px;
+      gap: 32px;
       margin-bottom: 50px;
       flex-wrap: wrap;
     }
@@ -39,12 +39,19 @@
     .stat {
       display: flex;
       flex-direction: column;
+      gap: 4px;
     }
 
     .stat-value {
-      font-size: 1.8rem;
+      font-size: 1.4rem;
       color: #fff;
       font-weight: bold;
+    }
+
+    .stat-value .sub {
+      font-size: 0.75rem;
+      color: #555;
+      font-weight: normal;
     }
 
     .stat-label {
@@ -53,18 +60,6 @@
       text-transform: uppercase;
       letter-spacing: 1px;
     }
-
-    .dot {
-      display: inline-block;
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      margin-right: 8px;
-      flex-shrink: 0;
-    }
-
-    .dot.online { background: #22c55e; box-shadow: 0 0 6px #22c55e; }
-    .dot.offline { background: #ef4444; box-shadow: 0 0 6px #ef4444; }
 
     .services {
       display: grid;
@@ -127,9 +122,7 @@
       color: #333;
     }
 
-    #last-updated {
-      color: #444;
-    }
+    #last-updated { color: #444; }
   </style>
 </head>
 <body>
@@ -140,19 +133,23 @@
   <div class="stats">
     <div class="stat">
       <span class="stat-value" id="stat-disk">--</span>
-      <span class="stat-label">Disk Used</span>
+      <span class="stat-label">Disk</span>
     </div>
     <div class="stat">
       <span class="stat-value" id="stat-ram">--</span>
       <span class="stat-label">RAM</span>
     </div>
     <div class="stat">
-      <span class="stat-value" id="stat-uptime">--</span>
-      <span class="stat-label">Uptime</span>
+      <span class="stat-value" id="stat-cpu">--</span>
+      <span class="stat-label">CPU</span>
     </div>
     <div class="stat">
-      <span class="stat-value">8</span>
-      <span class="stat-label">vCPU</span>
+      <span class="stat-value" id="stat-load">--</span>
+      <span class="stat-label">Load (1m)</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value" id="stat-uptime">--</span>
+      <span class="stat-label">Uptime</span>
     </div>
   </div>
 
@@ -166,22 +163,22 @@
 
   <script>
     const SERVICES = [
-      { key: 'nginx',       name: 'Nginx',          detail: 'Port 80/443 \u2014 thauyel.com',   always_on: true },
-      { key: 'minecraft',   name: 'Minecraft Server', detail: 'Port 25565 \u2014 Paper MC',        screen: 'polimc' },
-      { key: 'gmod',        name: 'GMod Server',      detail: 'Port 27015 \u2014 TTT',            screen: 'gmod' },
-      { key: 'terraria',    name: 'Terraria Server',  detail: 'Port 7777 \u2014 tmodloader',      screen: 'terraria' },
-      { key: 'dcbot',       name: 'dcbot',            detail: 'Screen session \u2014 Discord bot', always_on: true },
-      { key: 'pqr',         name: 'pqr',              detail: 'Port 5001 \u2014 Polimi QR tool',   always_on: true },
-      { key: 'cups',        name: 'CUPS',             detail: 'Port 631 \u2014 Print server',     always_on: true },
-      { key: 'hermes',      name: 'Hermes Agent',     detail: 'AI assistant \u2014 CLI/Discord/Telegram', always_on: true },
-      { key: 'ssh',         name: 'SSH',              detail: 'Port 22 \u2014 Server access',     always_on: true },
+      { key: 'minecraft', name: 'Minecraft Server', detail: 'Port 25565 \u2014 Paper MC',      screen: 'polimc' },
+      { key: 'gmod',      name: 'GMod Server',       detail: 'Port 27015 \u2014 TTT',         screen: 'gmod' },
+      { key: 'terraria',  name: 'Terraria Server',   detail: 'Port 7777 \u2014 tmodloader',   screen: 'terraria' },
+      { key: 'pqr',       name: 'pqr',                detail: 'Port 5001 \u2014 Polimi QR',    always_on: true },
+      { key: 'dcbot',     name: 'dcbot',              detail: 'Discord bot',                  always_on: true },
+      { key: 'hermes',    name: 'Hermes Agent',       detail: 'AI assistant',                 always_on: true },
+      { key: 'nginx',     name: 'Nginx',              detail: 'Port 80/443 \u2014 thauyel.com', always_on: true },
+      { key: 'cups',      name: 'CUPS',               detail: 'Port 631 \u2014 Print server',  always_on: true },
+      { key: 'ssh',       name: 'SSH',                detail: 'Port 22',                      always_on: true },
     ];
 
-    function badge(status) {
-      return `<span class="status-badge ${status}">${status}</span>`;
+    function badge(s) {
+      return `<span class="status-badge ${s}">${s}</span>`;
     }
 
-    function render(services, data) {
+    function renderServices(services, data) {
       const el = document.getElementById('services');
       el.innerHTML = services.map(svc => {
         let online;
@@ -200,23 +197,43 @@
       }).join('');
     }
 
+    function formatUptime(seconds) {
+      const days = Math.floor(seconds / 86400);
+      const hours = Math.floor((seconds % 86400) / 3600);
+      if (days > 0) return `${days}d ${hours}h`;
+      const mins = Math.floor((seconds % 3600) / 60);
+      return `${hours}h ${mins}m`;
+    }
+
     function update() {
       fetch('/status')
         .then(r => r.json())
         .then(data => {
-          render(SERVICES, data);
-          if (data.system) {
-            if (data.system.disk) document.getElementById('stat-disk').textContent = data.system.disk;
-            if (data.system.ram) document.getElementById('stat-ram').textContent = data.system.ram;
-            if (data.system.uptime) document.getElementById('stat-uptime').textContent = data.system.uptime;
+          renderServices(SERVICES, data);
+
+          const s = data.system || {};
+          const diskUsed = s.disk_used_gb !== undefined ? s.disk_used_gb : '--';
+          const diskTotal = s.disk_total_gb !== undefined ? s.disk_total_gb : '--';
+          const ramUsed = s.ram_used_gb !== undefined ? s.ram_used_gb : '--';
+          const ramTotal = s.ram_total_gb !== undefined ? s.ram_total_gb : '--';
+
+          document.getElementById('stat-disk').textContent =
+            diskTotal ? `${diskUsed} / ${diskTotal} GB` : `${diskUsed} GB`;
+          document.getElementById('stat-ram').textContent =
+            ramTotal ? `${ramUsed} / ${ramTotal} GB` : `${ramUsed} GB`;
+          document.getElementById('stat-cpu').textContent =
+            s.cpu_pct !== undefined ? `${s.cpu_pct}%` : '--';
+          document.getElementById('stat-load').textContent =
+            s.load_1m !== undefined ? s.load_1m : '--';
+
+          if (s.load_1m !== undefined) {
+            document.getElementById('stat-uptime').textContent = '--';
           }
-          const now = new Date();
+
           document.getElementById('last-updated').textContent =
-            now.toLocaleTimeString();
+            new Date().toLocaleTimeString();
         })
-        .catch(() => {
-          // Network error — leave last state visible
-        });
+        .catch(() => {});
     }
 
     update();
